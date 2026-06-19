@@ -2,7 +2,7 @@
     'name': 'OpenRouterAI Connector',
     'version': '19.0.1.0.0',
     'category': 'AI',
-    'summary': 'OpenRouter AI provider — sync 700+ models, chat completions, usage tracking',
+    'summary': 'OpenRouter AI provider - sync 700+ models, chat completions, usage tracking',
     'description': """
         Seamlessly integrate OpenRouter's AI model catalog with Odoo.
 
