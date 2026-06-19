@@ -47,6 +47,7 @@
         'views/openrouter_menu.xml',
     ],
     'images': [
+        'static/description/cover.png',
         'static/description/screenshots/chat_screenshot.png',
         'static/description/screenshots/models_list.png',
         'static/description/screenshots/provider_config.png',
