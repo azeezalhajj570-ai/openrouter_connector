@@ -28,7 +28,7 @@
                         <field name="api_key" password="True"/>
                         <field name="base_url"/>
                         <field name="default_route"/>
-                        <field name="embedding_model"/>
+                        <field name="embedding_model_id" options="{'no_create_edit': True, 'create': False}"/>
                         <field name="app_url"/>
                         <field name="app_name"/>
                     </group>

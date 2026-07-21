@@ -48,6 +48,7 @@ class AIOpenRouterModel(models.Model):
     per_request_prompt_tokens = fields.Char(string="Per-Request Prompt Tokens")
     per_request_completion_tokens = fields.Char(string="Per-Request Completion Tokens")
     is_free = fields.Boolean(string="Free")
+    is_embedding_model = fields.Boolean(string="Embedding Model", help="Can be used for embeddings")
     name_with_badge = fields.Char(string="Name", compute="_compute_name_with_badge", store=False)
     active = fields.Boolean(default=True)
     raw_payload = fields.Json(string="Raw Payload")

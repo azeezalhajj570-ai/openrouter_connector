@@ -25,10 +25,11 @@ class AIOpenRouterProvider(models.Model):
     base_url = fields.Char(string="Base URL", default="https://openrouter.ai/api/v1", required=True)
     app_url = fields.Char(string="App URL")
     app_name = fields.Char(string="App Name")
-    embedding_model = fields.Char(
+    embedding_model_id = fields.Many2one(
+        comodel_name="ai.openrouter.model",
         string="Embedding Model",
-        default="text-embedding-3-small",
-        help="Model ID used for generating embeddings (e.g. text-embedding-3-small, text-embedding-3-large)",
+        domain=[("active", "=", True), ("is_embedding_model", "=", True)],
+        help="Model used for generating embeddings. Synced from OpenRouter's embeddings endpoint.",
     )
     default_route = fields.Selection(
         selection=[

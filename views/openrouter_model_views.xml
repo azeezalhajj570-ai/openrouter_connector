@@ -25,6 +25,7 @@
                 <field name="per_request_prompt_tokens" optional="hide"/>
                 <field name="per_request_completion_tokens" optional="hide"/>
                 <field name="is_free" decoration-success="is_free == True"/>
+                <field name="is_embedding_model" optional="show"/>
                 <field name="active"/>
             </list>
         </field>

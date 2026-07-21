@@ -162,9 +162,52 @@ class AIOpenRouterSyncWizard(models.TransientModel):
             to_deactivate = OpenRouterModel.search([
                 ("provider_id", "=", provider.id),
                 ("external_id", "not in", list(seen_ids)),
+                ("is_embedding_model", "!=", True),
             ])
             if to_deactivate:
                 to_deactivate.write({"active": False})
+
+        # Sync embedding models
+        try:
+            embedding_payload = client.list_embedding_models()
+            embedding_data = embedding_payload.get("data") if isinstance(embedding_payload, dict) else None
+            if isinstance(embedding_data, list):
+                for item in embedding_data:
+                    external_id = item.get("id") or item.get("model")
+                    if not external_id:
+                        continue
+                    arch = item.get("architecture") or {}
+                    pricing = item.get("pricing") or {}
+                    top_provider = item.get("top_provider") or {}
+
+                    existing = OpenRouterModel.search([
+                        ("provider_id", "=", provider.id),
+                        ("external_id", "=", external_id),
+                    ], limit=1)
+                    vals = {
+                        "name": item.get("name") or external_id,
+                        "external_id": external_id,
+                        "description": item.get("description"),
+                        "provider_id": provider.id,
+                        "context_length": item.get("context_length") or 0,
+                        "prompt_price": _safe_float(pricing.get("prompt")),
+                        "completion_price": _safe_float(pricing.get("completion")),
+                        "image_price": _safe_float(pricing.get("image")),
+                        "request_price": _safe_float(pricing.get("request")),
+                        "is_free": bool(item.get("is_free")),
+                        "is_embedding_model": True,
+                        "active": True,
+                        "architecture_modality": arch.get("modality"),
+                        "architecture_tokenizer": arch.get("tokenizer"),
+                        "description": item.get("description"),
+                        "raw_payload": item,
+                    }
+                    if existing:
+                        existing.write(vals)
+                    else:
+                        OpenRouterModel.create(vals)
+        except Exception as exc:
+            _logger.warning("OpenRouter: failed to sync embedding models: %s", exc)
 
         return {"type": "ir.actions.act_window_close"}
 

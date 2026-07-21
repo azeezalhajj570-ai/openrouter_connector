@@ -46,6 +46,23 @@ class OpenRouterClient:
         except json.JSONDecodeError:
             raise UserError(_("OpenRouter returned invalid JSON for models list"))
 
+    def list_embedding_models(self):
+        url = f"{self.base_url}/embeddings/models"
+        try:
+            response = requests.get(url, headers=self._headers(), timeout=self.timeout)
+        except Exception as exc:
+            _logger.exception("OpenRouter embedding models request failed")
+            raise UserError(_("OpenRouter embedding models request failed: %s") % exc)
+
+        if response.status_code >= 400:
+            _logger.error("OpenRouter embedding models error %s: %s", response.status_code, response.text)
+            raise UserError(_("OpenRouter embedding models error %s: %s") % (response.status_code, response.text))
+
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            raise UserError(_("OpenRouter returned invalid JSON for embedding models"))
+
     def chat_completions(self, payload):
         url = f"{self.base_url}/chat/completions"
         try:

@@ -34,8 +34,8 @@ class AIAgent(models.Model):
             openrouter_provider = self.env['ai.openrouter.provider'].sudo().search(
                 [('active', '=', True)], limit=1
             )
-            if openrouter_provider and openrouter_provider.embedding_model:
-                return openrouter_provider.embedding_model
+            if openrouter_provider and openrouter_provider.embedding_model_id:
+                return openrouter_provider.embedding_model_id.external_id
         return super()._get_embedding_model()
 
     def _log_openrouter_request(self, llm_model, request_body, response_json=None, error_message=None):
