@@ -18,13 +18,14 @@ except (ImportError, AttributeError):
 if PATCH_PROVIDERS:
     Provider = llm_providers.Provider
     _original_get_provider = llm_providers.get_provider
+    _original_get_provider_for_embedding_model = llm_providers.get_provider_for_embedding_model
 
     if not any(p.name == "openrouter" for p in llm_providers.PROVIDERS):
         llm_providers.PROVIDERS.append(
             Provider(
                 "openrouter",
                 "OpenRouter",
-                "text-embedding-3-small",
+                "",
                 {},
                 [],
             )
@@ -47,6 +48,17 @@ if PATCH_PROVIDERS:
 
     llm_providers.get_provider = _get_provider
 
+    def _get_provider_for_embedding_model(env, embedding_model):
+        if env:
+            openrouter_provider = env["ai.openrouter.provider"].sudo().search(
+                [("active", "=", True), ("embedding_model", "=", embedding_model)], limit=1
+            )
+            if openrouter_provider:
+                return "openrouter"
+        return _original_get_provider_for_embedding_model(env, embedding_model)
+
+    llm_providers.get_provider_for_embedding_model = _get_provider_for_embedding_model
+
     # Also patch the direct import in ai_agent.py — it uses
     # `from odoo.addons.ai.utils.llm_providers import get_provider`,
     # so swapping llm_providers.get_provider isn't enough.
@@ -55,3 +67,10 @@ if PATCH_PROVIDERS:
         ai_agent_module.get_provider = _get_provider
     except (ImportError, AttributeError):
         _logger.warning("OpenRouter: could not patch ai_agent.get_provider reference")
+
+    # Also patch the embedding model module
+    try:
+        import odoo.addons.ai.models.ai_embedding as ai_embedding_module
+        ai_embedding_module.get_provider_for_embedding_model = _get_provider_for_embedding_model
+    except (ImportError, AttributeError):
+        _logger.warning("OpenRouter: could not patch ai_embedding.get_provider_for_embedding_model")
