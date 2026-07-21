@@ -26,8 +26,8 @@
         4. Start chatting with any available model
     """,
     'author': 'Azeez T.',
-    'author_email': 'azeez@azeez-tect.com',
-    'website': 'https://azeez-tect.com',
+    'author_email': 'support@azeez-tech.com',
+    'website': 'https://azeez-tech.com',
     'depends': [
         'base',
         'mail',
