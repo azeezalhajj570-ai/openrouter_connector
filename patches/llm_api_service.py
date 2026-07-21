@@ -164,6 +164,9 @@ def _request_llm_openrouter(
         _logger.error("OpenRouter API error: %s", error_msg)
         raise UserError(_("OpenRouter API error: %s") % error_msg)
 
+    if not llm_response.get("choices"):
+        _logger.warning("OpenRouter: no choices in response for model %s — full response: %s", llm_model, json.dumps(llm_response)[:1000])
+
     to_call = []
     response_texts = []
     next_inputs = list(inputs or ())
@@ -177,7 +180,7 @@ def _request_llm_openrouter(
                 try:
                     arguments = json.loads(func.get("arguments") or "{}")
                 except json.decoder.JSONDecodeError:
-                    _logger.error("OpenRouter: Malformed arguments: %s", call)
+                    _logger.warning("OpenRouter: Malformed arguments: %s", call)
                     continue
                 to_call.append((func.get("name"), call.get("id"), arguments))
             next_inputs.append({"role": "assistant", "tool_calls": tool_calls})
