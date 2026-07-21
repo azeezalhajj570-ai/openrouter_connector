@@ -158,6 +158,12 @@ def _request_llm_openrouter(
             _logger.exception("OpenRouter: failed to log error request")
         raise
 
+    if isinstance(llm_response, dict) and llm_response.get("error"):
+        error_detail = llm_response["error"]
+        error_msg = error_detail.get("message") or str(error_detail)
+        _logger.error("OpenRouter API error: %s", error_msg)
+        raise UserError(_("OpenRouter API error: %s") % error_msg)
+
     to_call = []
     response_texts = []
     next_inputs = list(inputs or ())
